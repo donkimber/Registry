@@ -8,6 +8,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
+DEPLOY_SERVER = 'sharedcam.paldeploy.com:8080'
+JUMPCHAT_SERVER = 'jumpchat.paldeploy.com'
+
+# not sure what this is used for, maybe it can be removed
+API_KEY = 'db763c63-8e61-43a1-9f8c-f6c9ec9d27f8'
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))

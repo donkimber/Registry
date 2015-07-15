@@ -6,8 +6,68 @@
 
 <script type="text/javascript">
 
+
+var CAMS_URL = "reg_query/"
+
+function timerFun()
+{
+    $.get(CAMS_URL, gotCams, 'json');
+    setTimeout(timerFun, 2000);
+}
+
+function gotCams(cams)
+{
+   var t0 = Date.now()/1000.0;
+   console.log("cams: ", JSON.stringify(cams));
+   var tstr = "<table class='table table-border'>\n"+
+                 "<thead>\n"+
+                 " <tr>\n"+
+                 "  <th>status</th>\n" +
+                 "  <th>name</th>\n" +
+                 "  <th>tags</th>\n" +
+                 "  <th>room</th>\n" +
+                 "  <th>dt</th>\n" +
+                 "  <th>state</th>\n"+
+                 " </tr>\n" +
+                 "</thead>\n" +
+                 "<tbody>\n";
+   for (var i in cams.rooms) {
+      var cam = cams.rooms[i];
+      if (cam.room !== "null"){
+        var dt = t0 - cam.lastTime;
+        var delta = Math.floor(dt);
+        var url = "http://jumpchat.paldeploy.com/sharedcam/?room="+cam.room;
+        var link = '<a href="'+url+'" target="_blank">'+cam.name+'</a>';
+        var join_button = "<a href='"+url+"' target='_blank' class='btn btn-info'>join</a>";
+        
+        var tags = "";
+        for (var t_id in cam.tags){
+          var t = cam.tags[t_id];
+          tags += "<a href=''>#" + t + "</a> "
+        }
+
+        if (cam.state > 1){
+           link = cam.name;
+           join_button = "<a href='"+url+"' class='btn btn-info' disabled>join</a>";
+        }
+
+        var row = " <tr>\n" +
+                  "  <td> "+join_button+"</td>\n" +
+                  "  <td> "+link+     " </td>\n" +
+                  "  <td> "+tags+ " </td>\n" +
+                  "  <td> "+cam.room+ " </td>\n" +
+                  "  <td> "+delta+    " </td>\n" +
+                  "  <td> "+cam.state+" </td>\n"+
+                  " </tr>\n";
+        tstr += row;
+      }
+   }
+   tstr += "</tbody>\n</table>";
+   $("#cams").html(tstr)
+}
+
 $(document).ready(function() {
-//    timerFun();
+    timerFun();
 //    window.setInterval(get_recent, 2000);
 });
 
@@ -27,8 +87,15 @@ $(document).ready(function() {
 
 <div id="cams"></div>
 
+
+
+
 <h2>Recent Photos
     <br /><small>Photos taken by remote viewers</small>
 </h2>
+
+<h2>Test Links</h2>
+<h4><a href="/reg_becomeguide/">become web guide</a></h4>
+<h4><a href="/reg_notification/">setup notification</a></h4>
 
 {% endblock %}
