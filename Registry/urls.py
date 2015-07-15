@@ -16,4 +16,9 @@ urlpatterns = patterns('',
     url(r'^reg_setNotification/$', 'Registry.views.reg_setNotification'),
     url(r'^reg_getNotification/$', 'Registry.views.reg_getNotification'),
     url(r'^reg_delNotification/$', 'Registry.views.reg_delNotification'),
+
+    url('', include('social.apps.django_app.urls', namespace='social')),
+    url(r'^login/$', 'Registry.views.login', name='login'),
+    url(r'^logout/$', 'Registry.views.logout', name='logout'),
+
 )

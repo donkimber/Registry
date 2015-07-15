@@ -162,3 +162,11 @@ def regp(request):
     jsonStr = ShareCamReg.regp(request, params)
 #    jsonStr = json.dumps({'return_code': 'failed'})
     return HttpResponse(jsonStr, content_type="application/json")
+
+def login(request):
+    return render_to_response('login.html', locals(), RequestContext(request))
+
+def logout(request):
+    auth_logout(request)
+    return redirect('index')
+
