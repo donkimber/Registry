@@ -51,12 +51,13 @@ def reg_connect(request):
     return HttpResponseRedirect(url)
 
 @csrf_exempt
-@header('Access-Control-Allow-Origin', '*')
 def reg_query(request):
     q = request.GET
     params = {'room': '', 'type': 'random', 'serverName': settings.JUMPCHAT_SERVER, 'apiKey': settings.API_KEY  }
     jsonStr = ShareCamReg.regQuery(request, params, q)
-    return HttpResponse(jsonStr, content_type="application/json")
+    response = HttpResponse(jsonStr, content_type="application/json")
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
 @csrf_exempt
 def reg_config(request):
