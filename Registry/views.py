@@ -37,6 +37,10 @@ def toBool(val):
     return False
 
 @csrf_exempt
+def reg_mapview(request):
+    return render_to_response("mapview.html", locals(), RequestContext(request))
+
+@csrf_exempt
 def reg_remove(request):
     q = request.GET
     params = {'room': '', 'type': 'random', 'serverName': settings.JUMPCHAT_SERVER, 'apiKey': settings.API_KEY  }

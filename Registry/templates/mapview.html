@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}WorldViews{% endblock %}
+{% block navtitle %}WorldViews{% endblock %}
+{% block jsext %}
+
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.css' rel='stylesheet' />
+<style>
+      #map { position:absolute; top:100px; height:60%; width:80%; }
+</style>
+
+<script type="text/javascript">
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiZG9ua2ltYmVyIiwiYSI6Ijc0NzFjYWUwM2E4NzgyNDc4M2Y1NTI3OTJlNWMyYjc5In0.xBSRvdl0XIy8SXDOIxRoCA';
+var map = null;
+
+var CAMS_URL = "/reg_query/"
+
+function timerFun()
+{
+    $.get(CAMS_URL, gotCams, 'json');
+    setTimeout(timerFun, 2000);
+}
+
+function gotCams(cams)
+{
+   var t0 = Date.now()/1000.0;
+   console.log("cams: ", JSON.stringify(cams));
+   var tstr = "<table class='table table-border'>\n"+
+                 "<thead>\n"+
+                 " <tr>\n"+
+                 "  <th>status</th>\n" +
+                 "  <th>name</th>\n" +
+                 "  <th>tags</th>\n" +
+                 "  <th>room</th>\n" +
+                 "  <th>dt</th>\n" +
+                 "  <th>state</th>\n"+
+                 " </tr>\n" +
+                 "</thead>\n" +
+                 "<tbody>\n";
+   for (var i in cams.rooms) {
+      var cam = cams.rooms[i];
+      if (cam.room !== "null"){
+        var dt = t0 - cam.lastTime;
+        var delta = Math.floor(dt);
+        var url = "http://jumpchat.paldeploy.com/sharedcam/?room="+cam.room;
+        var link = '<a href="'+url+'" target="_blank">'+cam.name+'</a>';
+        var join_button = "<a href='"+url+"' target='_blank' class='btn btn-info'>join</a>";
+        
+        var tags = "";
+        for (var t_id in cam.tags){
+          var t = cam.tags[t_id];
+          tags += "<a href=''>#" + t + "</a> "
+        }
+
+        if (cam.state > 1){
+           link = cam.name;
+           join_button = "<a href='"+url+"' class='btn btn-info' disabled>join</a>";
+        }
+
+        var row = " <tr>\n" +
+                  "  <td> "+join_button+"</td>\n" +
+                  "  <td> "+link+     " </td>\n" +
+                  "  <td> "+tags+ " </td>\n" +
+                  "  <td> "+cam.room+ " </td>\n" +
+                  "  <td> "+delta+    " </td>\n" +
+                  "  <td> "+cam.state+" </td>\n"+
+                  " </tr>\n";
+        tstr += row;
+      }
+   }
+   tstr += "</tbody>\n</table>";
+   $("#cams").html(tstr)
+}
+
+
+function setupMap() {
+   map = new mapboxgl.Map({
+      container: 'map', // container id
+      style: 'https://www.mapbox.com/mapbox-gl-styles/styles/outdoors-v7.json', //stylesheet location
+      center: [40, -74.50], // starting position
+      zoom: 9 // starting zoom
+   });
+}
+
+$(document).ready(function() {
+    setupMap();
+    timerFun();
+//    window.setInterval(get_recent, 2000);
+});
+
+
+</script>
+
+<style type="text/css">
+   
+</style>
+
+{% endblock %}
+{% block content %}
+
+<h2>
+    Available Guides
+    <br /><small>People available right now to show you a view into their world</small>
+</h2>
+
+<div id="cams"></div>
+
+<div id="map"></div>
+
+
+<h2>Recent Photos
+    <br /><small>Photos taken by remote viewers</small>
+</h2>
+
+
+{% endblock %}
