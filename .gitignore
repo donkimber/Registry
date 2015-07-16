@@ -215,3 +215,5 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 db.sqlite3
+readme.txt
+regdb.sqlite3
