@@ -7,8 +7,9 @@ https://docs.djangoproject.com/en/1.7/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
+from settings_custom import *
 
-DEPLOY_SERVER = 'sharedcam.paldeploy.com:8080'
+DEPLOY_SERVER = 'sharedcam.paldeploy.com'
 JUMPCHAT_SERVER = 'jumpchat.paldeploy.com'
 
 # not sure what this is used for, maybe it can be removed
@@ -108,3 +109,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+
