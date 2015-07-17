@@ -4,6 +4,7 @@
 {% block navtitle %}WorldViews{% endblock %}
 {% block jsext %}
 
+<link rel="stylesheet" href="{% static "css/grid.css" %}" type="text/css" />
 <script type="text/javascript">
 
 
@@ -26,8 +27,7 @@ function gotCams(cams)
                  "  <th>name</th>\n" +
                  "  <th>tags</th>\n" +
                  "  <th>room</th>\n" +
-                 "  <th>dt</th>\n" +
-                 "  <th>state</th>\n"+
+                 "  <th>num people</th>\n"+
                  " </tr>\n" +
                  "</thead>\n" +
                  "<tbody>\n";
@@ -56,7 +56,6 @@ function gotCams(cams)
                   "  <td> "+link+     " </td>\n" +
                   "  <td> "+tags+ " </td>\n" +
                   "  <td> "+cam.room+ " </td>\n" +
-                  "  <td> "+delta+    " </td>\n" +
                   "  <td> "+cam.state+" </td>\n"+
                   " </tr>\n";
         tstr += row;
@@ -68,8 +67,27 @@ function gotCams(cams)
 
 $(document).ready(function() {
     timerFun();
-//    window.setInterval(get_recent, 2000);
+    window.setInterval(get_recent, 2000);
 });
+
+{% if newest_photo_hash %}
+var newest_photo_hash = "{{newest_photo_hash}}";
+{% else %}
+var newest_photo_hash = "";
+{% endif %}
+function get_recent(){
+    var fetchRecentUrl = "http://sharedcam.paldeploy.com/recent/" +
+                               newest_photo_hash;
+    $.get( fetchRecentUrl, function( data ) {
+      var re = new RegExp("/media/", 'g');
+      data = data.replace(re, "http://sharedcam.paldeploy.com/media/");
+      console.log("data:::" + data);
+      $( "#recent" ).prepend( data );
+      
+      newest_photo_hash = $("#recent div")[0].id;
+      console.log( "Load was performed. New max content id", newest_photo_hash );
+    });
+}
 
 </script>
 
@@ -88,11 +106,13 @@ $(document).ready(function() {
 <div id="cams"></div>
 
 
-
-
 <h2>Recent Photos
     <br /><small>Photos taken by remote viewers</small>
 </h2>
+
+<div id="recent">
+    {% include 'grid.html' %}
+</div>
 
 <h2>Test Links</h2>
 <h4><a href="/reg_becomeguide/">become web guide</a></h4>
