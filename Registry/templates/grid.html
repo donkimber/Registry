@@ -27,8 +27,6 @@
 </script>
 {% endif %}
 
-XXXXXXXXXXXXXXXXXXX:
-
 {% for c in photos %}
     <div class="one_tag text-center" id="{{newest_photo_hash}}" style="background: url({{ MEDIA_URL }}{{c.thumbnail}}); background-size: 100%;  background-repeat: no-repeat; background-color: #eee; background-position:center;">
         <a href="{% url 'photo' c.hexdigest %}"><div class="clickable"></div></a>

@@ -18,11 +18,11 @@ import ShareCamReg
 import string
 import random
 import logging
-#from .models import Room
 from datetime import date
 #import jumpchat.utils
 import json
 import os
+from models import *
 
 def index(request):
     return render_to_response('index.html', locals(), RequestContext(request))
@@ -152,7 +152,6 @@ def reg_delNotification(request):
     jsonStr = json.dumps(obj)
     return HttpResponse(jsonStr, content_type="application/json")
 
-
 @csrf_exempt
 def reg(request):
     params = {'room': '', 'type': 'random', 'serverName': settings.JUMPCHAT_SERVER, 'apiKey': settings.API_KEY  }
@@ -166,6 +165,33 @@ def regp(request):
     jsonStr = ShareCamReg.regp(request, params)
 #    jsonStr = json.dumps({'return_code': 'failed'})
     return HttpResponse(jsonStr, content_type="application/json")
+
+@csrf_exempt
+def reg_getrequests(request):
+    requests = Request.objects.filter()
+    reqObjs = [req.getDict() for req in requests]
+    jsonStr = json.dumps(reqObjs)
+    response = HttpResponse(jsonStr, content_type="application/json")
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+@csrf_exempt
+def requestform(request):
+    return render_to_response("requestform.html", locals(), RequestContext(request))
+
+@csrf_exempt
+def reg_addrequest(request):
+    q = request.GET
+    requests = []
+    user_id = int(q.get("user_id", 1))
+    req = Request(text=q.get("text", ""), name=q.get("name"), user_id=user_id)
+    req.save()
+    obj = {'return': 'ok'}
+    jsonStr = json.dumps(obj)
+    response = HttpResponse(jsonStr, content_type="application/json")
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
 
 def login(request):
     return render_to_response('login.html', locals(), RequestContext(request))
