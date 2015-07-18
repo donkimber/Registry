@@ -4,11 +4,18 @@
 {% block navtitle %}WorldViews{% endblock %}
 {% block jsext %}
 
-<link rel="stylesheet" href="{% static "css/grid.css" %}" type="text/css" />
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.css' rel='stylesheet' />
+<style>
+      #map { position:absolute; top:100px; height:60%; width:80%; }
+</style>
+
 <script type="text/javascript">
 
+mapboxgl.accessToken = 'pk.eyJ1IjoiZG9ua2ltYmVyIiwiYSI6Ijc0NzFjYWUwM2E4NzgyNDc4M2Y1NTI3OTJlNWMyYjc5In0.xBSRvdl0XIy8SXDOIxRoCA';
+var map = null;
 
-var CAMS_URL = "reg_query/"
+var CAMS_URL = "/reg_query/"
 
 function timerFun()
 {
@@ -27,7 +34,8 @@ function gotCams(cams)
                  "  <th>name</th>\n" +
                  "  <th>tags</th>\n" +
                  "  <th>room</th>\n" +
-                 "  <th>num people</th>\n"+
+                 "  <th>dt</th>\n" +
+                 "  <th>state</th>\n"+
                  " </tr>\n" +
                  "</thead>\n" +
                  "<tbody>\n";
@@ -56,6 +64,7 @@ function gotCams(cams)
                   "  <td> "+link+     " </td>\n" +
                   "  <td> "+tags+ " </td>\n" +
                   "  <td> "+cam.room+ " </td>\n" +
+                  "  <td> "+delta+    " </td>\n" +
                   "  <td> "+cam.state+" </td>\n"+
                   " </tr>\n";
         tstr += row;
@@ -65,29 +74,22 @@ function gotCams(cams)
    $("#cams").html(tstr)
 }
 
+
+function setupMap() {
+   map = new mapboxgl.Map({
+      container: 'map', // container id
+      style: 'https://www.mapbox.com/mapbox-gl-styles/styles/outdoors-v7.json', //stylesheet location
+      center: [40, -74.50], // starting position
+      zoom: 9 // starting zoom
+   });
+}
+
 $(document).ready(function() {
+    setupMap();
     timerFun();
-    window.setInterval(get_recent, 2000);
+//    window.setInterval(get_recent, 2000);
 });
 
-{% if newest_photo_hash %}
-var newest_photo_hash = "{{newest_photo_hash}}";
-{% else %}
-var newest_photo_hash = "";
-{% endif %}
-function get_recent(){
-    var fetchRecentUrl = "http://sharedcam.paldeploy.com/recent/" +
-                               newest_photo_hash;
-    $.get( fetchRecentUrl, function( data ) {
-      var re = new RegExp("/media/", 'g');
-      data = data.replace(re, "http://sharedcam.paldeploy.com/media/");
-      console.log("data:::" + data);
-      $( "#recent" ).prepend( data );
-      
-      newest_photo_hash = $("#recent div")[0].id;
-      console.log( "Load was performed. New max content id", newest_photo_hash );
-    });
-}
 
 </script>
 
@@ -105,19 +107,12 @@ function get_recent(){
 
 <div id="cams"></div>
 
+<div id="map"></div>
+
 
 <h2>Recent Photos
     <br /><small>Photos taken by remote viewers</small>
 </h2>
 
-<div id="recent">
-    {% include 'grid.html' %}
-</div>
-
-<h2>Test Links</h2>
-<h4><a href="/reg_becomeguide/">become web guide</a></h4>
-<h4><a href="/reg_notification/">setup notification</a></h4>
-<h4><a href="/mapview/">map view</a></h4>
-<h4><a href="/requestform/">make request</a></h4>
 
 {% endblock %}

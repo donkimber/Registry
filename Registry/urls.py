@@ -24,7 +24,8 @@ urlpatterns = patterns('',
     url(r'^reg_setNotification/$', 'Registry.views.reg_setNotification'),
     url(r'^reg_getNotification/$', 'Registry.views.reg_getNotification'),
     url(r'^reg_delNotification/$', 'Registry.views.reg_delNotification'),
-    url(r'^reg_mapview/$', 'Registry.views.reg_mapview'),
+    url(r'^mapview/$', 'Registry.views.mapview', name='mapview'),
+    url(r'^globeview/$', 'Registry.views.globeview', name='globeview'),
 
     url(r'^admin/', include(admin.site.urls)),
 

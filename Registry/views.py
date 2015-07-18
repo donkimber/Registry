@@ -37,8 +37,12 @@ def toBool(val):
     return False
 
 @csrf_exempt
-def reg_mapview(request):
+def mapview(request):
     return render_to_response("mapview.html", locals(), RequestContext(request))
+
+@csrf_exempt
+def globeview(request):
+    return render_to_response("globeview.html", locals(), RequestContext(request))
 
 @csrf_exempt
 def reg_remove(request):
