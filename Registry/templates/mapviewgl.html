@@ -4,12 +4,12 @@
 {% block navtitle %}WorldViews{% endblock %}
 {% block jsext %}
 
-<!--
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.css' rel='stylesheet' />
--->
+<!--
 <script src='https://api.tiles.mapbox.com/mapbox.js/v2.2.1/mapbox.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox.js/v2.2.1/mapbox.css' rel='stylesheet' />
+-->
 
 <style>
       #xmap { position:absolute; top:100px; height:60%; width:80%; }
@@ -20,11 +20,11 @@
 <script src="/static/js/WVR.js"></script>
 <script type="text/javascript">
 
-//mapboxgl.accessToken = 'pk.eyJ1IjoiZG9ua2ltYmVyIiwiYSI6Ijc0NzFjYWUwM2E4NzgyNDc4M2Y1NTI3OTJlNWMyYjc5In0.xBSRvdl0XIy8SXDOIxRoCA';
-L.mapbox.accessToken = 'pk.eyJ1IjoiZG9ua2ltYmVyIiwiYSI6Ijc0NzFjYWUwM2E4NzgyNDc4M2Y1NTI3OTJlNWMyYjc5In0.xBSRvdl0XIy8SXDOIxRoCA';
+mapboxgl.accessToken = 'pk.eyJ1IjoiZG9ua2ltYmVyIiwiYSI6Ijc0NzFjYWUwM2E4NzgyNDc4M2Y1NTI3OTJlNWMyYjc5In0.xBSRvdl0XIy8SXDOIxRoCA';
+//L.mapbox.accessToken = 'pk.eyJ1IjoiZG9ua2ltYmVyIiwiYSI6Ijc0NzFjYWUwM2E4NzgyNDc4M2Y1NTI3OTJlNWMyYjc5In0.xBSRvdl0XIy8SXDOIxRoCA';
 
 var map = null;
-var myLayer = null;
+
 var ourPos = null;
 var defaultPos = [40, -74.50];
 var requests = {}
@@ -53,7 +53,7 @@ function showPosition(position) {
     report("pos: "+JSON.stringify(position));
     if (map) {
        report("panning to "+ourPos);
-       //map.panTo(ourPos);
+       map.panTo(ourPos);
     }
 }
 
@@ -79,10 +79,8 @@ function gotRequests(reqs)
        if (req.latitude && req.longitude) {
           latLng = [req.latitude, req.longitude];
           report("latLng: "+latLng);
-          //var feature = getFeatureMarker(req.name, req.text, req.latitude, req.longitude);
-          var layerObj = getFeatureLayer(req.name, req.text, req.latitude, req.longitude);
-	  report("adding layer: "+JSON.stringify(layerObj));
-          myLayer.setGeoJSON(layerObj);
+          //var marker = getFeatureMarker(req.name, req.text, req.latitude, req.longitude);
+          //map.addLayer(marker);
        }
     }
 }
@@ -148,7 +146,10 @@ function getFeatureMarker(name, text, lat, lon) {
             type: 'Point',
             // coordinates here are in longitude, latitude order because
             // x, y is the standard for GeoJSON and many formats
-            coordinates: [ lat, lon ]
+            coordinates: [
+              -77.03221142292,
+              38.913371603574 
+            ]
         },
         properties: {
             title: name,
@@ -162,19 +163,11 @@ function getFeatureMarker(name, text, lat, lon) {
    };
 }
 
-function getFeatureLayer(name, text, lat, lon)
-{
-   var feature = getFeatureMarker(name, text, lat, lon);
-   var obj = {'type': 'FeatureCollection',
-              'features': [ feature ]};
-   return obj;
-}
-
 function mapClick(e)
 {
    report("mapClick "+e);
-   var latLng = e.latlng;
-   report("latLng: "+latLng);
+   var latLng = e.latLng;
+   report("turkeys here....");
    var obj = {'latitude': latLng.lat,
               'longitude': latLng.lng,
               'name': 'another request',
@@ -192,9 +185,8 @@ function setupMap() {
    };
    if (ourPos)
       args.center = ourPos;
-   //map = new mapboxgl.Map(args);
-   map = L.mapbox.map('map', 'mapbox.light');
-   myLayer = L.mapbox.featureLayer().addTo(map);
+   map = new mapboxgl.Map(args);
+   //map = L.mapbox.map('map', 'mapbox.streets');
    map.on('click', mapClick);
 }
 
@@ -204,7 +196,7 @@ $(document).ready(function() {
     timerFun();
 //  window.setInterval(get_recent, 2000);
     $("#recenter").click(function(e) {
-        map.panTo(ourPos, 14);
+        map.panTo(ourPos);
     });
 });
 
