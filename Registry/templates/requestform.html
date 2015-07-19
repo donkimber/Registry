@@ -4,9 +4,9 @@
 {% block navtitle %}WorldViews Request{% endblock %}
 {% block jsext %}
 
+<script src="/static/js/WVR.js"></script>
 <script type="text/javascript">
 
-function report(str) { console.log(str); }
 
 function getTagsStr(tags)
 {
@@ -15,22 +15,21 @@ function getTagsStr(tags)
     return tags;
 }
 
+
 $(document).ready(function() {
    $("#go").click(function() {
       report("click");
       var name = $("#name").val();
       var text = $("#text").val();
       var tagStr = getTagsStr($("#tags").val());
-      var url = "/reg_addrequest/";
-      url += "?name="+name;
-      url += "&text="+text;
-      report("url: "+url);
-      $.getJSON(url, function(obj) {
-          report("got back: "+JSON.stringify(obj));
-          window.location.href = "/";
+      var req = {'name': name, 'text': text, tags: tagStr};
+      WVR.addRequest(req, function(obj) {
+          //window.location.href = "/";
+          window.location.href = "/reg_getrequests";
       });
    });
 });
+
 </script>
 
 <style type="text/css">

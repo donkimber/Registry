@@ -4,10 +4,12 @@
 {% block navtitle %}SharedCam Notification{% endblock %}
 {% block jsext %}
 
+<script src="/static/js/WVR.js"></script>
 <script type="text/javascript">
 
-function report(str) { console.log(str); }
+//function report(str) { console.log(str); }
 
+/*
 objToQueryStr = function(obj) {
   var str = [];
   for(var p in obj)
@@ -32,6 +34,7 @@ function qsToObj(a) {
     }
     return b;
 }
+*/
 
 function getTagsStr(tags)
 {
@@ -54,7 +57,7 @@ function saveNotification()
       params.sms_carrier = $("#carrier :selected").val();
       report("params: "+JSON.stringify(params));
       var url = "http://sharedcam.paldeploy.com/registry/reg_setNotification?";
-      var qs = objToQueryStr(params);
+      var qs = WVR.objToQueryStr(params);
       url += qs;
       report("url: "+url);
       $.getJSON(url, function(obj) {
@@ -93,7 +96,7 @@ $(document).ready(function() {
    $("#delete").click(deleteNotification);
    var name = "{{ user.username }}";
    var qs = window.location.href.slice(window.location.href.indexOf('?') + 1);
-   var qsObj = qsToObj(qs);
+   var qsObj = WVR.queryStringToObj(qs);
    if (qsObj.name)
       name = qsObj.name;
    var url = "http://sharedcam.paldeploy.com/registry/reg_getNotification?";

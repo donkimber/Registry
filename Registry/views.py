@@ -183,14 +183,24 @@ def reg_getrequests(request):
 def requestform(request):
     return render_to_response("requestform.html", locals(), RequestContext(request))
 
+def optionalFloat(f):
+    if f:
+        return float(f)
+    return f
+
 @csrf_exempt
 def reg_addrequest(request):
     q = request.GET
-    requests = []
-    user_id = int(q.get("user_id", 1))
-    req = Request(text=q.get("text", ""), name=q.get("name"), user_id=user_id)
+    args = {}
+    args['user_id'] = q.get('user_id', 1)
+    args['name'] = q.get('name', None)
+    args['text'] = q.get('text', None)
+    args['latitude'] = optionalFloat(q.get('latitude', None))
+    args['longitude'] = optionalFloat(q.get('longitude', None))
+    req = Request(**args)
     req.save()
-    obj = {'return': 'ok'}
+    obj = args
+    obj['return'] = 'ok'
     jsonStr = json.dumps(obj)
     response = HttpResponse(jsonStr, content_type="application/json")
     response['Access-Control-Allow-Origin'] = '*'
