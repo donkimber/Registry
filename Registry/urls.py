@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'Registry.views.index', name='index'),
+    url(r'^about/', 'Registry.views.about', name='about'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^reg_query/$', 'Registry.views.reg_query', name='reg_query'),
     url(r'^reg_connect/$', 'Registry.views.reg_connect'),

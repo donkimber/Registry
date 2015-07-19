@@ -145,7 +145,10 @@ function get_recent(){
           if (!lat || !lng)
              continue;
           report("obj "+i+" lat: "+lat+" lon: "+lng+" hash: "+hash);
-          addBillboard(lat, lng, CHERRIES_URL, 0.1);
+          var imgUrl = CHERRIES_URL;
+          imgUrl = "http://sharedcam.paldeploy.com/thumb/" + hash;
+          report("imgUrl "+imgUrl);
+          addBillboard(lat, lng, imgUrl, 0.3);
        }
        //console.log( "Load was performed. New max content id", newest_photo_hash );
     });

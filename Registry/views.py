@@ -24,9 +24,6 @@ import json
 import os
 from models import *
 
-def index(request):
-    return render_to_response('index.html', locals(), RequestContext(request))
-
 def toBool(val):
     if val in ["true","True"]:
         return True
@@ -35,6 +32,13 @@ def toBool(val):
     if val:
         return True
     return False
+
+
+def index(request):
+    return render_to_response('index.html', locals(), RequestContext(request))
+
+def about(request):
+    return render_to_response('about.html', locals(), RequestContext(request))
 
 @csrf_exempt
 def mapview(request):
