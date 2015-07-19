@@ -4,90 +4,160 @@
 {% block navtitle %}WorldViews{% endblock %}
 {% block jsext %}
 
-<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.js'></script>
-<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.css' rel='stylesheet' />
+<script src="/static/Cesium/1.7.1/Build/Cesium/Cesium.js"></script>
 <style>
-      #map { position:absolute; top:100px; height:60%; width:80%; }
+      @import url(/static/Cesium/1.7.1/Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
 </style>
 
+<script src="/static/js/WVR.js"></script>
 <script type="text/javascript">
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiZG9ua2ltYmVyIiwiYSI6Ijc0NzFjYWUwM2E4NzgyNDc4M2Y1NTI3OTJlNWMyYjc5In0.xBSRvdl0XIy8SXDOIxRoCA';
-var map = null;
+var REQUESTS_URL = "/reg_getrequests/"
+var MONACAT_URL = '/static/img/monacat.jpg';
+var CHERRIES_URL = '/static/img/cherries.png';
+var viewer = null;
+var requests = {};
+// Create a billboard collection with two billboards
+var billboards = null;
 
-var CAMS_URL = "/reg_query/"
+function getLocation() {
+    if (navigator.geolocation) {
+        var ret = navigator.geolocation.getCurrentPosition(handleLocation);
+        report("ret: "+ret);
+    } else {
+        report("Geolocation is not supported by this browser.");
+    }
+}
+
+function handleLocation(position) {
+    var lat = position.coords.latitude;
+    var lon = position.coords.longitude;
+    ourPos = [lat,lon];
+    report("lat: " + lat + "lon: " + lon);
+    report("pos: "+JSON.stringify(position));
+    if (viewer) {
+       report("panning to "+ourPos);
+       //map.setView(ourPos, 12);
+    }
+}
+
 
 function timerFun()
 {
-    $.get(CAMS_URL, gotCams, 'json');
+    //$.get(CAMS_URL, gotCams, 'json');
+    $.get(REQUESTS_URL, gotRequests, 'json');
+    $.get(REQUESTS_URL, gotRequests, 'json');
     setTimeout(timerFun, 2000);
 }
 
-function gotCams(cams)
-{
-   var t0 = Date.now()/1000.0;
-   console.log("cams: ", JSON.stringify(cams));
-   var tstr = "<table class='table table-border'>\n"+
-                 "<thead>\n"+
-                 " <tr>\n"+
-                 "  <th>status</th>\n" +
-                 "  <th>name</th>\n" +
-                 "  <th>tags</th>\n" +
-                 "  <th>room</th>\n" +
-                 "  <th>dt</th>\n" +
-                 "  <th>state</th>\n"+
-                 " </tr>\n" +
-                 "</thead>\n" +
-                 "<tbody>\n";
-   for (var i in cams.rooms) {
-      var cam = cams.rooms[i];
-      if (cam.room !== "null"){
-        var dt = t0 - cam.lastTime;
-        var delta = Math.floor(dt);
-        var url = "http://jumpchat.paldeploy.com/sharedcam/?room="+cam.room;
-        var link = '<a href="'+url+'" target="_blank">'+cam.name+'</a>';
-        var join_button = "<a href='"+url+"' target='_blank' class='btn btn-info'>join</a>";
-        
-        var tags = "";
-        for (var t_id in cam.tags){
-          var t = cam.tags[t_id];
-          tags += "<a href=''>#" + t + "</a> "
+function addBox(lat, lon) {
+    var box = viewer.entities.add({
+        name : 'Blue box',
+        //position: Cesium.Cartesian3.fromDegrees(lon, lat, 300000.0),
+        position: Cesium.Cartesian3.fromDegrees(lon, lat, 0.0),
+        box : {
+            dimensions : new Cesium.Cartesian3(1000.0, 1000.0, 1000.0),
+            material : Cesium.Color.RED
         }
-
-        if (cam.state > 1){
-           link = cam.name;
-           join_button = "<a href='"+url+"' class='btn btn-info' disabled>join</a>";
-        }
-
-        var row = " <tr>\n" +
-                  "  <td> "+join_button+"</td>\n" +
-                  "  <td> "+link+     " </td>\n" +
-                  "  <td> "+tags+ " </td>\n" +
-                  "  <td> "+cam.room+ " </td>\n" +
-                  "  <td> "+delta+    " </td>\n" +
-                  "  <td> "+cam.state+" </td>\n"+
-                  " </tr>\n";
-        tstr += row;
-      }
-   }
-   tstr += "</tbody>\n</table>";
-   $("#cams").html(tstr)
+    });
+    viewer.entities.add(box);
+    return box;
 }
 
+function addBillboard(lat, lon, imgUrl, scale)
+{
+// Example 1:  Add a billboard, specifying all the default values.
+  if (!imgUrl)
+     imgUrl = MONACAT_URL;
+  if (!scale)
+     scale = 0.1;
+  var b = billboards.add({
+  show : true,
+  position : Cesium.Cartesian3.fromDegrees(lon, lat, 50),
+  pixelOffset : Cesium.Cartesian2.ZERO,
+  eyeOffset : Cesium.Cartesian3.ZERO,
+  horizontalOrigin : Cesium.HorizontalOrigin.CENTER,
+  verticalOrigin : Cesium.VerticalOrigin.CENTER,
+  'scale' : scale,
+  image : imgUrl,
+  color : Cesium.Color.WHITE,
+  id : undefined
+});
+   report("addBillboard "+b);
+}
 
-function setupMap() {
-   map = new mapboxgl.Map({
-      container: 'map', // container id
-      style: 'https://www.mapbox.com/mapbox-gl-styles/styles/outdoors-v7.json', //stylesheet location
-      center: [40, -74.50], // starting position
-      zoom: 9 // starting zoom
-   });
+function addMarker(lat, lon)
+{
+//    return addBox(lat, lon);
+    return addBillboard(lat, lon);
+}
+
+function gotRequests(reqs)
+{
+    //report("gotRequests: "+JSON.stringify(reqs));
+    report("gotRequests");
+    for (var i=0; i<reqs.length; i++) {
+       var req = reqs[i];
+       var id = req.id;
+       if (requests[id]) {
+          //report("skipping req id "+id);
+          continue;
+       }
+       requests[id] = req;
+       if (req.latitude && req.longitude) {
+          latLng = [req.latitude, req.longitude];
+          report("latLng: "+latLng);
+	  addMarker(req.latitude, req.longitude);
+       }
+    }
+}
+
+var newest_photo_hash = "";
+var hashes = {};
+
+function get_recent(){
+    var fetchRecentUrl = "http://sharedcam.paldeploy.com/recent/" +
+                               newest_photo_hash + "?json=true";
+    $.getJSON( fetchRecentUrl, function( objs ) {
+       for(var i=0; i<objs.length; i++) {
+          var obj = objs[i];
+          var hash = obj.hash;
+          if (hashes[hash])
+              continue;
+          hashes[hash] = obj;
+          var metadata = obj.metadata;
+          //report("metadata: "+metadata);
+          try {
+              metadata = JSON.parse(metadata);
+          }
+          catch (e) {
+	     report("error for obj "+i+" hash: "+hash);
+             continue;
+          }
+          var lat = metadata.latitude;
+          var lng = metadata.longitude;
+          report("obj "+i+": "+JSON.stringify(obj));
+          //report("meta: " + JSON.stringify(metadata));
+          //report("latLng: "+lat+" "+lng);
+          if (!lat || !lng)
+             continue;
+          report("obj "+i+" lat: "+lat+" lon: "+lng+" hash: "+hash);
+          addBillboard(lat, lng, CHERRIES_URL, 0.1);
+       }
+       //console.log( "Load was performed. New max content id", newest_photo_hash );
+    });
 }
 
 $(document).ready(function() {
-    setupMap();
+    viewer = new Cesium.Viewer('cesiumContainer');
+    scene = viewer.scene;				 
+    billboards = scene.primitives.add(new Cesium.BillboardCollection());
+    //setupMap();
+    setInterval(get_recent, 5000);
     timerFun();
-//    window.setInterval(get_recent, 2000);
 });
 
 
@@ -100,18 +170,13 @@ $(document).ready(function() {
 {% endblock %}
 {% block content %}
 
+<div id="cesiumContainer"></div>
+<script>
+</script>
+
 <h2>
     Available Guides
     <br /><small>People available right now to show you a view into their world</small>
-</h2>
-
-<div id="cams"></div>
-
-<div id="map"></div>
-
-
-<h2>Recent Photos
-    <br /><small>Photos taken by remote viewers</small>
 </h2>
 
 

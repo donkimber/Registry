@@ -34,18 +34,16 @@ report("Got report");
 var CAMS_URL = "/reg_query/"
 var REQUESTS_URL = "/reg_getrequests/"
 
-// var x = document.getElementById("demo");
-
 function getLocation() {
     if (navigator.geolocation) {
-        var ret = navigator.geolocation.getCurrentPosition(showPosition);
+        var ret = navigator.geolocation.getCurrentPosition(handleLocation);
         report("ret: "+ret);
     } else {
         report("Geolocation is not supported by this browser.");
     }
 }
 
-function showPosition(position) {
+function handleLocation(position) {
     var lat = position.coords.latitude;
     var lon = position.coords.longitude;
     ourPos = [lat,lon];
@@ -54,6 +52,7 @@ function showPosition(position) {
     if (map) {
        report("panning to "+ourPos);
        //map.panTo(ourPos);
+       map.setView(ourPos, 12);
     }
 }
 
@@ -79,10 +78,14 @@ function gotRequests(reqs)
        if (req.latitude && req.longitude) {
           latLng = [req.latitude, req.longitude];
           report("latLng: "+latLng);
+          /*
           //var feature = getFeatureMarker(req.name, req.text, req.latitude, req.longitude);
           var layerObj = getFeatureLayer(req.name, req.text, req.latitude, req.longitude);
 	  report("adding layer: "+JSON.stringify(layerObj));
           myLayer.setGeoJSON(layerObj);
+          */
+          var marker = getMarker(req.name, req.text,
+				 req.latitude, req.longitude);
        }
     }
 }
@@ -138,6 +141,42 @@ function gotCams(cams)
    $("#cams").html(tstr)
 }
 
+// MIT-licensed code by Benjamin Becquet
+// https://github.com/bbecquet/Leaflet.PolylineDecorator
+L.RotatedMarker = L.Marker.extend({
+  options: { angle: 0 },
+  _setPos: function(pos) {
+    L.Marker.prototype._setPos.call(this, pos);
+    if (L.DomUtil.TRANSFORM) {
+      // use the CSS transform rule if available
+      this._icon.style[L.DomUtil.TRANSFORM] += ' rotate(' + this.options.angle + 'deg)';
+    } else if (L.Browser.ie) {
+      // fallback for IE6, IE7, IE8
+      var rad = this.options.angle * L.LatLng.DEG_TO_RAD,
+      costheta = Math.cos(rad),
+      sintheta = Math.sin(rad);
+      this._icon.style.filter += ' progid:DXImageTransform.Microsoft.Matrix(sizingMethod=\'auto expand\', M11=' +
+        costheta + ', M12=' + (-sintheta) + ', M21=' + sintheta + ', M22=' + costheta + ')';
+    }
+  }
+});
+
+L.rotatedMarker = function(pos, options) {
+    return new L.RotatedMarker(pos, options);
+};
+
+function getMarker(name, text, lat, lon)
+{
+   var marker = L.rotatedMarker(new L.LatLng(lat, lon), {
+      icon: L.icon({
+         iconUrl: 'https://www.mapbox.com/maki/renders/airport-24@2x.png',
+         iconSize: [24, 24],
+      }),
+      draggable: true
+   });
+   marker.addTo(map);
+   return marker;
+}
 
 function getFeatureMarker(name, text, lat, lon) {
     return {

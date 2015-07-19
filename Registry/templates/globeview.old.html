@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}WorldViews{% endblock %}
+{% block navtitle %}WorldViews{% endblock %}
+{% block jsext %}
+
+  <style>
+      @import url(/static/Cesium/1.7.1/Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+  </style>
+
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.css' rel='stylesheet' />
+<style>
+      #map { position:absolute; top:100px; height:60%; width:80%; }
+</style>
+
+<script type="text/javascript">
+
+
+$(document).ready(function() {
+    setupMap();
+    timerFun();
+//    window.setInterval(get_recent, 2000);
+});
+
+
+</script>
+
+<style type="text/css">
+</style>
+{% endblock %}
+{% block content %}
+
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+  </script>
+
+<h2>
+    Available Guides
+    <br /><small>People available right now to show you a view into their world</small>
+</h2>
+
+{% endblock %}

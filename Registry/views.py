@@ -43,6 +43,7 @@ def mapview(request):
 @csrf_exempt
 def globeview(request):
     return render_to_response("globeview.html", locals(), RequestContext(request))
+#    return render_to_response("cesium.html", locals(), RequestContext(request))
 
 @csrf_exempt
 def reg_remove(request):
