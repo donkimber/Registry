@@ -43,6 +43,12 @@ def about(request):
 def projects(request):
     return render_to_response('projects.html', locals(), RequestContext(request))
 
+def members(request):
+    return render_to_response('members.html', locals(), RequestContext(request))
+
+def inspirations(request):
+    return render_to_response('inspirations.html', locals(), RequestContext(request))
+
 @csrf_exempt
 def mapview(request):
     return render_to_response("mapview.html", locals(), RequestContext(request))

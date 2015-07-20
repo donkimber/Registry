@@ -23,9 +23,11 @@
                 </button>
                 <a class="navbar-brand" href="{% url 'index' %}">{% block navtitle %}{% endblock %}</a>
                 <a class="navbar-brand" href="{% url 'about' %}">About</a>
-                <a class="navbar-brand" href="{% url 'projects' %}">Projects</a>
                 <a class="navbar-brand" href="{% url 'mapview' %}">Map</a>
                 <a class="navbar-brand" href="{% url 'globeview' %}">Globe</a>
+                <a class="navbar-brand" href="{% url 'projects' %}">Projects</a>
+                <a class="navbar-brand" href="{% url 'members' %}">Members</a>
+                <a class="navbar-brand" href="{% url 'inspirations' %}">Inspirations</a>
 <!--
                 <a class="navbar-brand" href="/static/Cesium/1.7.1/Apps/HelloWorld.html">Globe</a>
 -->
@@ -33,7 +35,10 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav pull-right">
                     {% if user.is_authenticated %}
+<!--
                         <li><a href="{% url 'index' %}">Logged in as {{ user }}</a></li>
+-->
+                        <li><a href="{% url 'index' %}">{{ user }}</a></li>
                         <li><a href="{% url 'logout' %}">Log out</a></li>
                     {% else %}
                         <li><a href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}">Login with Twitter</a></li>
