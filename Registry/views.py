@@ -40,6 +40,9 @@ def index(request):
 def about(request):
     return render_to_response('about.html', locals(), RequestContext(request))
 
+def projects(request):
+    return render_to_response('projects.html', locals(), RequestContext(request))
+
 @csrf_exempt
 def mapview(request):
     return render_to_response("mapview.html", locals(), RequestContext(request))

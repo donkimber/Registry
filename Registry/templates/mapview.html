@@ -233,6 +233,7 @@ function setupMap() {
       args.center = ourPos;
    //map = new mapboxgl.Map(args);
    map = L.mapbox.map('map', 'mapbox.light');
+   //map = L.mapbox.map('map', 'mapbox.basic');
    myLayer = L.mapbox.featureLayer().addTo(map);
    map.on('click', mapClick);
 }
