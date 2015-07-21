@@ -41,6 +41,7 @@ def about(request):
     return render_to_response('about.html', locals(), RequestContext(request))
 
 def projects(request):
+    projs = Project.objects.all()
     return render_to_response('projects.html', locals(), RequestContext(request))
 
 def members(request):

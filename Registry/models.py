@@ -25,3 +25,18 @@ class Request(models.Model):
     def __unicode__(self):
         return "Request #%s" % (self.text)
 
+class Project(models.Model):
+    name = models.CharField(max_length=100, primary_key=True)
+    title = models.CharField(max_length=200, blank=True)
+    description = models.TextField(blank=True)
+    users = models.ManyToManyField(User)
+
+    # tags
+    tags = models.ManyToManyField(Tag)
+
+    def getDict(self):
+        return {'id': self.id, 'title': self.title, 'description': self.description}
+
+    def __unicode__(self):
+        return "Project #%s" % (self.name)
+
