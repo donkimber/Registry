@@ -21,6 +21,27 @@
 -->
 <h3>{{proj.title}} </h3>
 {{proj.description}}<br>
+{% if proj.members.all %}
+  Members: 
+     {% for member in proj.members.all %}
+        {{member}}
+     {% endfor %}
+  <br>
+{% endif %}
+{% if proj.followers.all %}
+  Followers: 
+     {% for follower in proj.followers.all %}
+        {{follower}}
+     {% endfor %}
+  <br>
+{% endif %}
+{% if user.is_authenticated %}
+   {% if user in proj.members.all %}
+      You are in project.  Edit
+   {% else %}
+      Join
+   {% endif %}
+{% endif %}
 &nbsp;
 <p>
 

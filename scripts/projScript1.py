@@ -5,10 +5,12 @@
 
 from Registry.models import Project
 
+"""
 p = Project.objects.get(name="proj1")
 p.delete()
 p = Project.objects.get(name="proj2")
 p.delete()
+"""
 
 
 proj = Project(name="wvtechdev",

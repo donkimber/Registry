@@ -29,7 +29,8 @@ class Project(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
     title = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
-    users = models.ManyToManyField(User)
+    members = models.ManyToManyField(User, related_name='projmembers')
+    followers = models.ManyToManyField(User, related_name='projfollowers')
 
     # tags
     tags = models.ManyToManyField(Tag)
