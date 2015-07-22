@@ -27,7 +27,9 @@ var map = null;
 var myLayer = null;
 var ourPos = null;
 var defaultPos = [40, -74.50];
+var selectedPos = null;
 var requests = {}
+var reqNum = 0;
 
 report("Got report");
 
@@ -169,7 +171,9 @@ function getMarker(name, text, lat, lon)
 {
    var marker = L.rotatedMarker(new L.LatLng(lat, lon), {
       icon: L.icon({
-         iconUrl: 'https://www.mapbox.com/maki/renders/airport-24@2x.png',
+         //iconUrl: 'https://www.mapbox.com/maki/renders/airport-24@2x.png',
+         //iconUrl: '/static/img/question-mark.png',
+         iconUrl: '/static/img/red-question-mark.png',
          iconSize: [24, 24],
       }),
       draggable: true
@@ -214,12 +218,10 @@ function mapClick(e)
    report("mapClick "+e);
    var latLng = e.latlng;
    report("latLng: "+latLng);
-   var obj = {'latitude': latLng.lat,
-              'longitude': latLng.lng,
-              'name': 'another request',
-              'text': 'where is the drone?'};
-   report("obj: "+JSON.stringify(obj));
-   WVR.addRequest(obj);
+   selectedPos = [latLng.lat, latLng.lng];
+   report("selectedPos: "+selectedPos);
+   $("#reqStatDiv").html("Have Precise Location");
+//   WVR.addRequest(obj);
 }
 
 function setupMap() {
@@ -246,6 +248,20 @@ $(document).ready(function() {
     $("#recenter").click(function(e) {
         map.panTo(ourPos, 14);
     });
+    $("#addButton").click(function(e) {
+        report("add request");
+        reqNum++;
+        var obj = {'text': $("#requestText").val(),
+                   'name': "req"+reqNum};
+        report("selectedPos: "+selectedPos);
+        if (selectedPos) {
+           report("setting latLng");
+           obj.latitude = selectedPos[0];
+           obj.longitude = selectedPos[1];
+        }
+        report("obj: "+JSON.stringify(obj));
+        WVR.addRequest(obj);
+    });
 });
 
 
@@ -262,22 +278,22 @@ $(document).ready(function() {
 <div id="map"></div>
 <input id="recenter" type="Button" value="Recenter">
 
+<p>
+<div id="requestDiv">
+Question or Request: &nbsp;&nbsp;
+<span id="reqStatDiv"></span>
+<br>
+<textarea id="requestText" rows="5" cols="60"></textarea><br>
+<input id="addButton" type="button" value="Post">
+&nbsp;
+</div>
+
+<!--
 <h2>
     Available Guides
     <br /><small>People available right now to show you a view into their world</small>
 </h2>
 <div id="cams"></div>
-
-
-<h2>Recent Photos
-    <br /><small>Photos taken by remote viewers</small>
-</h2>
-
-<p> &nbsp; <p> &nbsp; <p> &nbsp;
-<p> &nbsp; <p> &nbsp; <p> &nbsp;
-<p> &nbsp; <p> &nbsp; <p> &nbsp;
-<p> &nbsp; <p> &nbsp; <p> &nbsp;
-<p> &nbsp; <p> &nbsp; <p> &nbsp;
-
+-->
 
 {% endblock %}
