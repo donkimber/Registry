@@ -44,6 +44,21 @@ def projects(request):
     projs = Project.objects.all()
     return render_to_response('projects.html', locals(), RequestContext(request))
 
+@csrf_exempt
+def addproj(request):
+    q = request.POST
+    req = dict(q)
+    username = req['username'][0]
+    title = req['title'][0]
+    desc = req['description'][0]
+    p = Project(title=title, description=desc)
+    p.save()
+    req['gotUsername'] = username
+    user = User.objects.filter(username=username)[0]
+    p.members.add(user)
+    jsonStr = json.dumps(req)
+    return HttpResponse(jsonStr, content_type="application/json")
+
 def members(request):
     return render_to_response('members.html', locals(), RequestContext(request))
 
