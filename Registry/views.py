@@ -59,6 +59,35 @@ def addproj(request):
     jsonStr = json.dumps(req)
     return HttpResponse(jsonStr, content_type="application/json")
 
+@csrf_exempt
+def joinproj(request):
+    q = request.POST
+    req = dict(q)
+    username = req['username'][0]
+    name = req['name'][0]
+    p = Project.objects.filter(name=name)[0]
+    req['gotProj'] = p.name;
+    user = User.objects.filter(username=username)[0]
+    req['gotUsername'] = username
+    p.members.add(user)
+    p.followers.add(user)
+    jsonStr = json.dumps(req)
+    return HttpResponse(jsonStr, content_type="application/json")
+
+@csrf_exempt
+def followproj(request):
+    q = request.POST
+    req = dict(q)
+    username = req['username'][0]
+    name = req['name'][0]
+    p = Project.objects.filter(name=name)[0]
+    req['gotProj'] = p.name;
+    user = User.objects.filter(username=username)[0]
+    req['gotUsername'] = username
+    p.followers.add(user)
+    jsonStr = json.dumps(req)
+    return HttpResponse(jsonStr, content_type="application/json")
+
 def members(request):
     return render_to_response('members.html', locals(), RequestContext(request))
 

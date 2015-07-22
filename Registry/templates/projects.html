@@ -29,6 +29,34 @@ $(document).ready(function() {
                }});
        $("#addProj").show();
    });
+   $(".join-button").click(function(e) {
+       report("join-button click");
+       var url = "/joinproj/";
+       var obj = {name: e.target.id, username: "{{user}}"};
+       report("Obj: "+JSON.stringify(obj));
+       $.ajax({type: "POST",
+               url: url,
+               dataType: "json",
+               data: obj,
+               success: function(res) {
+                   report("Sent it. got: "+JSON.stringify(res));
+                   window.location.href = window.location.href;
+               }});
+   });
+   $(".follow-button").click(function(e) {
+       report("follow-button click");
+       var url = "/followproj/";
+       var obj = {name: e.target.id, username: "{{user}}"};
+       report("Obj: "+JSON.stringify(obj));
+       $.ajax({type: "POST",
+               url: url,
+               dataType: "json",
+               data: obj,
+               success: function(res) {
+                   report("Sent it. got: "+JSON.stringify(res));
+                   window.location.href = window.location.href;
+               }});
+    });
 });
 </script>
 
@@ -60,9 +88,14 @@ $(document).ready(function() {
 {% endif %}
 {% if user.is_authenticated %}
    {% if user in proj.members.all %}
-      You are in project.  Edit
+     <!-- You are in project.  Edit -->
    {% else %}
-      Join
+      <span class="join-button" id="{{proj.name}}">Join</span>
+   {% endif %}
+   {% if user in proj.followers.all %}
+     <!-- You are following project. -->
+   {% else %}
+      <span class="follow-button" id="{{proj.name}}">Follow</span>
    {% endif %}
 {% endif %}
 &nbsp;
