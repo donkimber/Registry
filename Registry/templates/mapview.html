@@ -321,6 +321,24 @@ $(document).ready(function() {
             hideNewRequestMarker();
         });
     });
+    $("#createSessionButton").click(function(e) {
+        $("#sessionRoom").val(WVR.getRandRoom());
+        $("#createSessionDiv").toggle();
+    });
+    $("#addSessionButton").click(function(e) {
+        report("addSession click");
+        var room = $("#sessionRoom").val();
+        var name = $("#sessionGuideName").val();
+        var tagStr = WVR.getTagsStr($("#sessionTags").val());
+        var url = "http://jumpchat.paldeploy.com/sharedcam/?room="+room;
+        url += "&clientType=web";
+        url += "&name="+name;
+        if (tagStr)
+            url += "&tagStr="+tagStr;
+        url += "&registryServer="+window.location.host;
+        window.open(url, "WebSession");
+        //window.location.href = url;
+    });
 });
 
 
@@ -344,6 +362,24 @@ $(document).ready(function() {
 <tr>
 <td valign="top" width="40%">
 
+<div id="sessionsDiv">
+<h3>Sessions</h3>
+
+<b id="createSessionButton">Create session as JumpChat Web Guide</b><br>
+<div id="createSessionDiv" hidden>
+
+Name: <input id="sessionGuideName" type="text" size="40" value=""><br>
+Tags: <input id="sessionTags" type="text" size="40" value=""><br>
+Description:<br>
+<textarea id="sessionText" rows="5" cols="50"></textarea><br>
+Jumpchat Room: <input id="sessionRoom" type="text" size="12" value=""><br>
+Max Guests: <input id="sessionTags" type="text" size="3" value="5"><br>
+<input id="addSessionButton" type="button" value="Post">
+</div>
+<div id="sessionsListDiv">
+</div>
+</div>
+
 <div id="guidesDiv">
 <h3>Guides</h3>
 <b id="registerGuideButton">Register as Guide</b><br>
@@ -361,13 +397,6 @@ Description:<br>
 <div id="guidesListDiv">
 </div>
 </div>
-
-<div id="sessionsDiv">
-<h3>Sessions</h3>
-<div id="sessionsListDiv">
-</div>
-</div>
-
 
 </td>
 <td>

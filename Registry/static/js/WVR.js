@@ -5,6 +5,27 @@ function report(str) {
    console.log(str);
 }
 
+WVR.formatNumber = function(num, length)
+{
+    var r = "" + num;
+    while (r.length < length) {
+        r = "0" + r;
+    }
+    return r;
+}
+
+WVR.getTagsStr = function(tags)
+{
+//TODO: map multiple tags to safe string
+    report("tags: "+tags);
+    return tags;
+}
+
+WVR.getRandRoom = function() {
+    var n = Math.floor(Math.random() * 10000000000);
+    return WVR.formatNumber(n, 10);
+}
+
 WVR.addRequest = function(req, doneFn)
 {
       var url = "/reg_addrequest/";
