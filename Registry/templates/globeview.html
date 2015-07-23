@@ -16,11 +16,13 @@
 <script type="text/javascript">
 
 var REQUESTS_URL = "/reg_getrequests/"
+var GUIDES_URL = "/reg_getguides/"
 var MONACAT_URL = '/static/img/monacat.jpg';
 var CHERRIES_URL = '/static/img/cherries.png';
 var scene = null;
 var cesiumTerrainProviderMeshes = null;
-var requests = {};
+var requestObjs = {};
+var guideObjs = {};
 // Create a billboard collection with two billboards
 var billboards = null;
 var pinBuilder = null;
@@ -51,7 +53,7 @@ function timerFun()
 {
     //$.get(CAMS_URL, gotCams, 'json');
     $.get(REQUESTS_URL, gotRequests, 'json');
-    $.get(REQUESTS_URL, gotRequests, 'json');
+    $.get(GUIDES_URL, gotGuides, 'json');
     setTimeout(timerFun, 2000);
 }
 
@@ -93,14 +95,13 @@ function addBillboard(lat, lon, imgUrl, scale)
 
 var _reqNo = 0;
 
-function addGuideMarker(lat, lon, req)
+function addGuideMarker(lat, lon, guide)
 {
 //    return addBox(lat, lon);
 //    return addBillboard(lat, lon);
-    var name = req.name+" "+_reqNo++;
-    //var str = name;
-    var str = "G";
-    var reqPin = viewer.entities.add({
+    var name = guide.name;
+    var str = "G "+name;
+    var guidePin = viewer.entities.add({
        name: name,
        position: Cesium.Cartesian3.fromDegrees(lon, lat),
        scale: 0.5,
@@ -109,6 +110,7 @@ function addGuideMarker(lat, lon, req)
           verticalOrigin : Cesium.VerticalOrigin.BOTTOM
        }
    });
+   return guidePin;
 }
 
 function addRequestMarker(lat, lon, req)
@@ -136,18 +138,32 @@ function gotRequests(reqs)
     for (var i=0; i<reqs.length; i++) {
        var req = reqs[i];
        var id = req.id;
-       if (requests[id]) {
+       if (requestObjs[id]) {
           //report("skipping req id "+id);
           continue;
        }
-       requests[id] = req;
+       requestObjs[id] = req;
        if (req.latitude && req.longitude) {
           latLng = [req.latitude, req.longitude];
           report("latLng: "+latLng);
-	  if (i % 2 == 0)
-              addRequestMarker(req.latitude, req.longitude, req);
-          else
-              addGuideMarker(req.latitude, req.longitude, req);
+          addRequestMarker(req.latitude, req.longitude, req);
+       }
+    }
+}
+
+function gotGuides(guides)
+{
+    //report("gotRequests: "+JSON.stringify(guides));
+    report("gotRequests");
+    for (var i=0; i<guides.length; i++) {
+       var guide = guides[i];
+       var name = guide.name;
+       if (guideObjs[name]) {
+          continue;
+       }
+       guideObjs[name] = name;
+       if (guide.latitude && guide.longitude) {
+          addGuideMarker(guide.latitude, guide.longitude, guide);
        }
     }
 }
@@ -226,11 +242,5 @@ $(document).ready(function() {
 <div id="cesiumContainer"></div>
 <script>
 </script>
-
-<h2>
-    Available Guides
-    <br /><small>People available right now to show you a view into their world</small>
-</h2>
-
 
 {% endblock %}

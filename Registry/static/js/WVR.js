@@ -5,14 +5,26 @@ function report(str) {
    console.log(str);
 }
 
-function addRequest(req, doneFn)
+WVR.addRequest = function(req, doneFn)
 {
       var url = "/reg_addrequest/";
       var qs = objToQueryStr(req);
       if (qs)
 	  url += "?"+qs;
-      //url += "?name="+req.name;
-      //url += "&text="+req.text;
+      report("url: "+url);
+      $.getJSON(url, function(obj) {
+          report("got back: "+JSON.stringify(obj));
+          if (doneFn)
+             doneFn(obj);
+      });
+}
+
+WVR.addGuide = function(guide, doneFn)
+{
+      var url = "/reg_addguide/";
+      var qs = objToQueryStr(guide);
+      if (qs)
+	  url += "?"+qs;
       report("url: "+url);
       $.getJSON(url, function(obj) {
           report("got back: "+JSON.stringify(obj));
@@ -49,6 +61,5 @@ function queryStrToObj(a) {
 }
 
 WVR.report = report
-WVR.addRequest = addRequest;
 WVR.queryStrToObj = queryStrToObj
 WVR.objToQueryStr = objToQueryStr

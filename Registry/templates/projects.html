@@ -15,6 +15,7 @@ $(document).ready(function() {
    $("#addButton").click(function(e) {
        var url = "/addproj/";
        var obj = {};
+       obj.name = $("#name").val();
        obj.title = $("#title").val();
        obj.description = $("#description").val();
        obj.username = "{{ user }}";
@@ -113,6 +114,7 @@ $(document).ready(function() {
 <h4>Create New Project</h4>
 &nbsp;
 <p>
+Name: <input id="name" type="text" value="" size=50><br>
 Title: <input id="title" type="text" value="" size=90><br>
 Description:<br>
 <textarea id="description" rows="20" cols="100"></textarea><br>

@@ -239,6 +239,24 @@ def reg_getrequests(request):
     return response
 
 @csrf_exempt
+def reg_getguides(request):
+    guides = Guide.objects.filter()
+    gObjs = [g.getDict() for g in guides]
+    jsonStr = json.dumps(gObjs)
+    response = HttpResponse(jsonStr, content_type="application/json")
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+@csrf_exempt
+def reg_getsessions(request):
+    sessions = Session.objects.filter()
+    sObjs = [s.getDict() for s in sessions]
+    jsonStr = json.dumps(sObjs)
+    response = HttpResponse(jsonStr, content_type="application/json")
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+@csrf_exempt
 def requestform(request):
     return render_to_response("requestform.html", locals(), RequestContext(request))
 
@@ -252,12 +270,49 @@ def reg_addrequest(request):
     q = request.GET
     args = {}
     args['user_id'] = q.get('user_id', 1)
-    args['name'] = q.get('name', None)
     args['text'] = q.get('text', None)
     args['latitude'] = optionalFloat(q.get('latitude', None))
     args['longitude'] = optionalFloat(q.get('longitude', None))
     req = Request(**args)
     req.save()
+    obj = args
+    obj['return'] = 'ok'
+    jsonStr = json.dumps(obj)
+    response = HttpResponse(jsonStr, content_type="application/json")
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+@csrf_exempt
+def reg_addguide(request):
+    q = request.GET
+    args = {}
+    args['name'] = q.get('name', None)
+    args['text'] = q.get('text', None)
+    args['latitude'] = optionalFloat(q.get('latitude', None))
+    args['longitude'] = optionalFloat(q.get('longitude', None))
+    tags = q.get('tags', None)
+    guide = Guide(**args)
+    guide.save()
+    obj = args
+    obj['return'] = 'ok'
+    jsonStr = json.dumps(obj)
+    response = HttpResponse(jsonStr, content_type="application/json")
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+@csrf_exempt
+def reg_addsession(request):
+    q = request.GET
+    args = {}
+    args['name'] = q.get('name', None)
+    args['text'] = q.get('text', None)
+    args['latitude'] = optionalFloat(q.get('latitude', None))
+    args['longitude'] = optionalFloat(q.get('longitude', None))
+    tags = q.get('tags', None)
+    """
+    session = Session(**args)
+    session.save()
+    """
     obj = args
     obj['return'] = 'ok'
     jsonStr = json.dumps(obj)

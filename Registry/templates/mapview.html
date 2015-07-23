@@ -28,13 +28,17 @@ var myLayer = null;
 var ourPos = null;
 var defaultPos = [40, -74.50];
 var selectedPos = null;
-var requests = {}
-var reqNum = 0;
+var requestObjs = {};
+var guideObjs = {};
+var sessionObjs = {};
+var newRequestMarker = null;
 
 report("Got report");
 
 var CAMS_URL = "/reg_query/"
 var REQUESTS_URL = "/reg_getrequests/"
+var GUIDES_URL = "/reg_getguides/"
+var SESSIONS_URL = "/reg_getsessions/"
 
 function getLocation() {
     if (navigator.geolocation) {
@@ -55,6 +59,7 @@ function handleLocation(position) {
        report("panning to "+ourPos);
        //map.panTo(ourPos);
        map.setView(ourPos, 12);
+       getPosMarker(ourPos);
     }
 }
 
@@ -62,7 +67,43 @@ function timerFun()
 {
 //    $.get(CAMS_URL, gotCams, 'json');
     $.get(REQUESTS_URL, gotRequests, 'json');
-    setTimeout(timerFun, 2000);
+    $.get(SESSIONS_URL, gotSessions, 'json');
+    $.get(GUIDES_URL, gotGuides, 'json');
+    setTimeout(timerFun, 3000);
+}
+
+function guideHtml(g)
+{
+   return g.name+"<br><i>"+g.text+"<p>";
+}
+
+function reqHtml(req)
+{
+   return req.text+"<br><i>"+req.user+"</i>&nbsp;&nbsp"+req.request_time+"<p>";
+}
+
+function gotSessions(sessions)
+{
+    report("gotSessions"+JSON.stringify(sessions));
+}
+
+function gotGuides(guides)
+{
+    for (var i=0; i<guides.length; i++) {
+       var guide = guides[i];
+       var name = guide.name;
+       if (guideObjs[name]) {
+          continue;
+       }
+       guideObjs[name] = guide;
+       if (guide.latitude && guide.longitude) {
+          report("latLng: "+guide.latitude +" "+ guide.longitude);
+          getGuideMarker(guide.text, guide.latitude, guide.longitude);
+       }
+       report("**** writing to guides dif...");
+       $("#guidesListDiv").append(guideHtml(guide));
+    }
+    report("gotGuides: "+JSON.stringify(guides));
 }
 
 function gotRequests(reqs)
@@ -72,23 +113,16 @@ function gotRequests(reqs)
     for (var i=0; i<reqs.length; i++) {
        var req = reqs[i];
        var id = req.id;
-       if (requests[id]) {
-          //report("skipping req id "+id);
+       if (requestObjs[id]) {
           continue;
        }
-       requests[id] = req;
+       requestObjs[id] = req;
        if (req.latitude && req.longitude) {
           latLng = [req.latitude, req.longitude];
           report("latLng: "+latLng);
-          /*
-          //var feature = getFeatureMarker(req.name, req.text, req.latitude, req.longitude);
-          var layerObj = getFeatureLayer(req.name, req.text, req.latitude, req.longitude);
-	  report("adding layer: "+JSON.stringify(layerObj));
-          myLayer.setGeoJSON(layerObj);
-          */
-          var marker = getMarker(req.name, req.text,
-				 req.latitude, req.longitude);
+          getRequestMarker(req.text, req.latitude, req.longitude);
        }
+       $("#requestsListDiv").append(reqHtml(req));
     }
 }
 
@@ -167,50 +201,53 @@ L.rotatedMarker = function(pos, options) {
     return new L.RotatedMarker(pos, options);
 };
 
-function getMarker(name, text, lat, lon)
+function getMarker(text, lat, lon, iconUrl, draggable)
 {
    var marker = L.rotatedMarker(new L.LatLng(lat, lon), {
       icon: L.icon({
-         //iconUrl: 'https://www.mapbox.com/maki/renders/airport-24@2x.png',
-         //iconUrl: '/static/img/question-mark.png',
-         iconUrl: '/static/img/red-question-mark.png',
+         iconUrl: iconUrl,
          iconSize: [24, 24],
       }),
-      draggable: true
+      draggable: draggable
    });
    marker.addTo(map);
    return marker;
 }
 
-function getFeatureMarker(name, text, lat, lon) {
-    return {
-        // this feature is in the GeoJSON format: see geojson.org
-        // for the full specification
-       type: 'Feature',
-       geometry: {
-            type: 'Point',
-            // coordinates here are in longitude, latitude order because
-            // x, y is the standard for GeoJSON and many formats
-            coordinates: [ lat, lon ]
-        },
-        properties: {
-            title: name,
-            description: text,
-            // one can customize markers by adding simplestyle properties
-            // https://www.mapbox.com/guides/an-open-platform/#simplestyle
-            'marker-size': 'large',
-            'marker-color': '#BE9A6B',
-            'marker-symbol': 'cafe'
-        }
-   };
+function getNewRequestMarker(lat, lon)
+{
+   hideNewRequestMarker();
+   var iconUrl = '/static/img/question-mark.png';
+   return getMarker(null, lat, lon, iconUrl, true);
 }
 
-function getFeatureLayer(name, text, lat, lon)
+function hideNewRequestMarker()
 {
-   var feature = getFeatureMarker(name, text, lat, lon);
-   var obj = {'type': 'FeatureCollection',
-              'features': [ feature ]};
-   return obj;
+   if (newRequestMarker) {
+      //TODO:  Help!  I can't find how to delete marker!
+      newRequestMarker.setOpacity(0);
+      //newRequestMarker.removeFrom(map);
+      newRequestMarker = null;
+   }
+}
+
+
+function getRequestMarker(text, lat, lon)
+{
+   var iconUrl = '/static/img/red-question-mark.png';
+   return getMarker(text, lat, lon, iconUrl, false);
+}
+
+function getGuideMarker(text, lat, lon)
+{
+   var iconUrl = '/static/img/info-icon.png';
+   return getMarker(text, lat, lon, iconUrl, false);
+}
+
+function getPosMarker(pos)
+{
+   var iconUrl = '/static/img/black-marker.png';
+   return getMarker("You are here", pos[0], pos[1], iconUrl, false);
 }
 
 function mapClick(e)
@@ -220,8 +257,9 @@ function mapClick(e)
    report("latLng: "+latLng);
    selectedPos = [latLng.lat, latLng.lng];
    report("selectedPos: "+selectedPos);
+   newRequestMarker = getNewRequestMarker(latLng.lat, latLng.lng);
    $("#reqStatDiv").html("Have Precise Location");
-//   WVR.addRequest(obj);
+   $("#guideStatDiv").html("Have Precise Location");
 }
 
 function setupMap() {
@@ -234,7 +272,8 @@ function setupMap() {
    if (ourPos)
       args.center = ourPos;
    //map = new mapboxgl.Map(args);
-   map = L.mapbox.map('map', 'mapbox.light');
+   //map = L.mapbox.map('map', 'mapbox.light');
+   map = L.mapbox.map('map', 'mapbox.streets');
    //map = L.mapbox.map('map', 'mapbox.basic');
    myLayer = L.mapbox.featureLayer().addTo(map);
    map.on('click', mapClick);
@@ -248,19 +287,39 @@ $(document).ready(function() {
     $("#recenter").click(function(e) {
         map.panTo(ourPos, 14);
     });
-    $("#addButton").click(function(e) {
+    $("#newRequestButton").click(function(e) {
+        $("#newRequestDiv").toggle();
+    });
+    $("#addRequestButton").click(function(e) {
         report("add request");
-        reqNum++;
-        var obj = {'text': $("#requestText").val(),
-                   'name': "req"+reqNum};
-        report("selectedPos: "+selectedPos);
+        var obj = {'text': $("#requestText").val()}
         if (selectedPos) {
-           report("setting latLng");
            obj.latitude = selectedPos[0];
            obj.longitude = selectedPos[1];
         }
         report("obj: "+JSON.stringify(obj));
-        WVR.addRequest(obj);
+        WVR.addRequest(obj, function(obj) {
+            $("#requestText").val("");
+            hideNewRequestMarker();
+        });
+    });
+    $("#registerGuideButton").click(function(e) {
+        $("#registerGuideDiv").toggle();
+    });
+    $("#addGuideButton").click(function(e) {
+        report("add request");
+        var obj = {'name': $("#guideName").val(),
+                   'tags': $("#guideTags").val(),
+                   'text': $("#guideText").val()}
+        if (selectedPos) {
+           obj.latitude = selectedPos[0];
+           obj.longitude = selectedPos[1];
+        }
+        report("obj: "+JSON.stringify(obj));
+        WVR.addGuide(obj, function(obj) {
+            $("#guideText").val("");
+            hideNewRequestMarker();
+        });
     });
 });
 
@@ -278,22 +337,66 @@ $(document).ready(function() {
 <div id="map"></div>
 <input id="recenter" type="Button" value="Recenter">
 
+<table>
+<col width="49%">
+<col width="2%">
+<col width="49%">
+<tr>
+<td valign="top" width="40%">
+
+<div id="guidesDiv">
+<h3>Guides</h3>
+<b id="registerGuideButton">Register as Guide</b><br>
+<div id="registerGuideDiv" hidden>
+&nbsp;&nbsp;
+<span id="guideStatDiv"></span><br>
+
+Name: <input id="guideName" type="text" size="40" value=""><br>
+Tags: <input id="guideTags" type="text" size="40" value=""><br>
+Description:<br>
+<textarea id="guideText" rows="5" cols="50"></textarea><br>
+<input id="addGuideButton" type="button" value="Post">
+</div>
 <p>
-<div id="requestDiv">
-Question or Request: &nbsp;&nbsp;
-<span id="reqStatDiv"></span>
-<br>
-<textarea id="requestText" rows="5" cols="60"></textarea><br>
-<input id="addButton" type="button" value="Post">
-&nbsp;
+<div id="guidesListDiv">
+</div>
 </div>
 
-<!--
-<h2>
-    Available Guides
-    <br /><small>People available right now to show you a view into their world</small>
-</h2>
-<div id="cams"></div>
--->
+<div id="sessionsDiv">
+<h3>Sessions</h3>
+<div id="sessionsListDiv">
+</div>
+</div>
+
+
+</td>
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;
+</td>
+
+<td width="40%">
+
+<div id="requestDiv">
+<h3>Requests</h3>
+
+<b id="newRequestButton">New Request or Question</b><br>
+<div id="newRequestDiv" hidden>
+ &nbsp;&nbsp;
+<span id="reqStatDiv"></span>
+</h4>
+<br>
+<textarea id="requestText" rows="5" cols="50"></textarea><br>
+<input id="addRequestButton" type="button" value="Post">
+</div>
+&nbsp;
+
+<h4>Existing Requests</h4>
+<div id="requestsListDiv">
+</div>
+</div>
+
+</td>
+</tr>
+</table>
 
 {% endblock %}

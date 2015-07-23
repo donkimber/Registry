@@ -41,6 +41,7 @@ $(document).ready(function() {
       url += "&name="+name;
       if (tagStr)
           url += "&tagStr="+tagStr;
+      url += "&registryServer="+window.location.host;
       //window.open(url);
       window.location.href = url;
    });
