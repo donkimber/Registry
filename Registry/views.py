@@ -219,7 +219,9 @@ def reg_delNotification(request):
 def reg(request):
     params = {'room': '', 'type': 'random', 'serverName': settings.JUMPCHAT_SERVER, 'apiKey': settings.API_KEY  }
     jsonStr = ShareCamReg.reg(request, params)
-    return HttpResponse(jsonStr, content_type="application/json")
+    response = HttpResponse(jsonStr, content_type="application/json")
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
 # Post version of reg
 @csrf_exempt
