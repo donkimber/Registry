@@ -35,7 +35,7 @@ var newRequestMarker = null;
 
 report("Got report");
 
-var CAMS_URL = "/reg_query/"
+var CAMS_URL = "reg_query/"
 var REQUESTS_URL = "/reg_getrequests/"
 var GUIDES_URL = "/reg_getguides/"
 var SESSIONS_URL = "/reg_getsessions/"
@@ -65,7 +65,7 @@ function handleLocation(position) {
 
 function timerFun()
 {
-//    $.get(CAMS_URL, gotCams, 'json');
+    $.get(CAMS_URL, gotCams, 'json');
     $.get(REQUESTS_URL, gotRequests, 'json');
     $.get(SESSIONS_URL, gotSessions, 'json');
     $.get(GUIDES_URL, gotGuides, 'json');
@@ -364,6 +364,8 @@ $(document).ready(function() {
 
 <div id="sessionsDiv">
 <h3>Sessions</h3>
+
+<div id="cams"></div>
 
 <b id="createSessionButton">Create session as JumpChat Web Guide</b><br>
 <div id="createSessionDiv" hidden>
