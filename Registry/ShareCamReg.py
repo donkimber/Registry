@@ -63,6 +63,9 @@ def reg_(request, params, q):
 #        return regQuery(request, params, q)
     name = q.get('name', "")
     state = q.get("state", 0)
+    lat = q.get("latitude", None)
+    lon = q.get("longitude", None)
+    maxUsers = q.get("maxUsers", 2)
     tagStr = q.get("tagStr", "")
     tags = tagStr.split()
     numUsers = q.get("numUsers", 0)
@@ -76,6 +79,12 @@ def reg_(request, params, q):
     #    obj['state'] = state
     state = numUsers
     obj['state'] = state
+    obj['numUsers'] = numUsers
+    obj['maxUsers'] = maxUsers
+    if lat:
+        obj['latitude'] = lat
+    if lon:
+        obj['longitude'] = lon
     print "state:", state
     if room in ROOM_DB:
         oldObj = ROOM_DB[room]
