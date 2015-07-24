@@ -172,7 +172,7 @@ var newest_photo_hash = "";
 var hashes = {};
 
 function get_recent(){
-    var fetchRecentUrl = "http://sharedcam.paldeploy.com/recent/" +
+    var fetchRecentUrl = "https://sharedcam.paldeploy.com/recent/" +
                                newest_photo_hash + "?json=true";
     $.getJSON( fetchRecentUrl, function( objs ) {
        for(var i=0; i<objs.length; i++) {
@@ -199,7 +199,7 @@ function get_recent(){
              continue;
           report("obj "+i+" lat: "+lat+" lon: "+lng+" hash: "+hash);
           var imgUrl = CHERRIES_URL;
-          imgUrl = "http://sharedcam.paldeploy.com/thumb/" + hash;
+          imgUrl = "https://sharedcam.paldeploy.com/thumb/" + hash;
           report("imgUrl "+imgUrl);
           addBillboard(lat, lng, imgUrl, 0.3);
        }

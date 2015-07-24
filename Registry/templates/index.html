@@ -77,11 +77,11 @@ var newest_photo_hash = "{{newest_photo_hash}}";
 var newest_photo_hash = "";
 {% endif %}
 function get_recent(){
-    var fetchRecentUrl = "http://sharedcam.paldeploy.com/recent/" +
+    var fetchRecentUrl = "https://sharedcam.paldeploy.com/recent/" +
                                newest_photo_hash;
     $.get( fetchRecentUrl, function( data ) {
       var re = new RegExp("/media/", 'g');
-      data = data.replace(re, "http://sharedcam.paldeploy.com/media/");
+      data = data.replace(re, "https://sharedcam.paldeploy.com/media/");
       console.log("data:::" + data);
       $( "#recent" ).prepend( data );
       
