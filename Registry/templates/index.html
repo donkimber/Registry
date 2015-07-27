@@ -9,6 +9,7 @@
 <script type="text/javascript">
 
 
+PHOTOSERVER = "https://sharedcam.paldeploy.com"
 var CAMS_URL = "reg_query/"
 
 function timerFun()
@@ -76,12 +77,17 @@ var newest_photo_hash = "{{newest_photo_hash}}";
 {% else %}
 var newest_photo_hash = "";
 {% endif %}
+
 function get_recent(){
-    var fetchRecentUrl = "https://sharedcam.paldeploy.com/recent/" +
+    var fetchRecentUrl = PHOTOSERVER+"/recent/" +
                                newest_photo_hash;
     $.get( fetchRecentUrl, function( data ) {
       var re = new RegExp("/media/", 'g');
-      data = data.replace(re, "https://sharedcam.paldeploy.com/media/");
+      data = data.replace(re, PHOTOSERVER+"/media/");
+      re = new RegExp("/photo/", 'g');
+      data = data.replace(re, PHOTOSERVER+"/photo/");
+      re = new RegExp("/admin/", 'g');
+      data = data.replace(re, PHOTOSERVER+"/admin/");
       console.log("data:::" + data);
       $( "#recent" ).prepend( data );
       
