@@ -41,12 +41,16 @@ INSTALLED_APPS = (
     'Registry',
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'social.apps.django_app.default',
+    'django_comments',
+    'mptt',
+    'tagging',
+    'zinnia'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -59,6 +63,22 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+TEMPLATES = [
+  {
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'APP_DIRS': True,
+    'OPTIONS': {
+      'context_processors': [
+        'django.contrib.auth.context_processors.auth',
+        'django.template.context_processors.i18n',
+        'django.template.context_processors.request',
+        'django.contrib.messages.context_processors.messages',
+        'zinnia.context_processors.version',  # Optional
+      ]
+    }
+  }
+]
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
@@ -69,6 +89,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'social.apps.django_app.context_processors.backends',
     'social.apps.django_app.context_processors.login_redirect',
+
+    'django.core.context_processors.request',
+#    'django.template.context_processors.i18n',
+#    'django.template.context_processors.request',
+
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -90,6 +115,8 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'regdb.sqlite3'),
     }
 }
+
+SITE_ID = 1
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
