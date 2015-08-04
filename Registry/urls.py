@@ -44,7 +44,7 @@ urlpatterns = patterns('',
     url(r'^login/$', 'Registry.views.login', name='login'),
     url(r'^logout/$', 'Registry.views.logout', name='logout'),
 
-    url(r'^weblog/', include('zinnia.urls', namespace='zinnia')),
+    url(r'^weblog/', include('zinnia.urls', namespace='zinnia'), name='blog'),
     url(r'^comments/', include('django_comments.urls')),
 
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

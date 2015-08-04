@@ -23,6 +23,10 @@
                 </button>
                 <a class="navbar-brand" href="{% url 'index' %}">{% block navtitle %}{% endblock %}</a>
                 <a class="navbar-brand" href="{% url 'about' %}">About</a>
+<!--
+                <a class="navbar-brand" href="{ % url 'blog' % }">Blog</a>
+-->
+                <a class="navbar-brand" href="/weblog">Blog</a>
                 <a class="navbar-brand" href="{% url 'mapview' %}">Map</a>
                 <a class="navbar-brand" href="{% url 'globeview' %}">Globe</a>
                 <a class="navbar-brand" href="{% url 'projects' %}">Projects</a>
