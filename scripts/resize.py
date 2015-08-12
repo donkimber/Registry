@@ -1,3 +1,6 @@
+"""
+http://stackoverflow.com/questions/9142825/transparent-png-resizing-with-python-image-library-and-the-halo-effect
+"""
 import Image, numpy
 img = Image.open('../Registry/static/img/blue-marble.png')
 premult = numpy.fromstring(img.tostring(), dtype=numpy.uint8)
