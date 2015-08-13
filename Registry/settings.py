@@ -50,7 +50,10 @@ INSTALLED_APPS = (
     'django_comments',
     'mptt',
     'tagging',
-    'zinnia'
+    'zinnia',
+#    'tinymce',
+#    'zinnia_tinymce',
+#    'sorl.thumbnail',
 )
 
 MIDDLEWARE_CLASSES = (
